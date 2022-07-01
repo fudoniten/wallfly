@@ -57,7 +57,7 @@ in {
       enable = true;
       wantedBy = [ "multi-user.target" ];
       after = [ "network-online.target" ];
-      path = with pkgs; [ net-tools xprintidle ];
+      path = with pkgs; [ nettools xprintidle ];
       serviceConfig = {
         ExecStart = pkgs.writeShellScript "launch-wallfly.sh" ''
           ${pkgs.wallfly}/bin/wallfly \
