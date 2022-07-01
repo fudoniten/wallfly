@@ -54,6 +54,7 @@ in {
     nixpkgs.overlays = [ wallfly-overlay ];
 
     systemd.user.services.wallfly = {
+      enable = true;
       wantedBy = [ "multi-user.target" ];
       after = [ "network-online.target" ];
       serviceConfig = {
