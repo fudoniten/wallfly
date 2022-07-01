@@ -37,6 +37,6 @@
           inherit (self.packages."${prev.system}") wallfly;
         };
 
-        nixosModule = import ./module.nix;
+        nixosModule = import ./module.nix self.overlay;
       };
 }

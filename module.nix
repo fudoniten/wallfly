@@ -1,3 +1,5 @@
+wallfly-overlay:
+
 { config, lib, pkgs, ... }:
 
 with lib;
@@ -49,6 +51,8 @@ in {
   };
 
   config = mkIf cfg.enable {
+    nixpkgs.overlays = [ wallfly-overlay ];
+
     systemd.user.services.wallfly = {
       wantedBy = [ "multi-user.target" ];
       after = [ "network-online.target" ];
