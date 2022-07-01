@@ -63,8 +63,8 @@ in {
               --mqtt-broker-uri=${cfg.mqtt.broker-uri} \
               --mqtt-username=${cfg.mqtt.username} \
               --mqtt-password-file=${cfg.mqtt.password-file} \
-              --time-to-idle=${cfg.time-to-idle} \
-              --delay-time=${cfg.delay-time}
+              --time-to-idle=${toString cfg.time-to-idle} \
+              --delay-time=${toString cfg.delay-time}
         '';
         PrivateTmp = true;
         PrivateDevices = true;
