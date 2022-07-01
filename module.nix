@@ -39,7 +39,7 @@ in {
       type = int;
       description =
         "Number of seconds before considering the user idle on this host.";
-      default = "900"; # 15 minutes
+      default = 900; # 15 minutes
     };
 
     delay-time = mkOption {
