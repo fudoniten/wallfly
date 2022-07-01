@@ -89,7 +89,7 @@
   [["-l" "--location LOCATION" "Location (in house) of the host running this job."]
    ["-b" "--mqtt-broker-uri URI" "URI of the MQTT broker."]
    ["-u" "--mqtt-username USERNAME" "Username to use when connecting to MQTT."]
-   ["-p" "--password-file PASSWORD-FILE" "Path to a file containing the password for this client."]
+   ["-p" "--mqtt-password-file PASSWORD-FILE" "Path to a file containing the password for this client."]
    ["-t" "--time-to-idle SECONDS" "Number of seconds before considering this host idle."]
    ["-d" "--delay-time SECONDS" "Time to wait before polling for idle time."]])
 
