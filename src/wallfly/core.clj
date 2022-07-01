@@ -1,6 +1,6 @@
 (ns wallfly.core
   (:require [clojure.java.shell :as shell]
-            [clojure.core.async :refer [chan >!! <!! >! <! go-loop mult tap timeout alt!]]
+            [clojure.core.async :refer [chan >!! <!! go-loop timeout alt!]]
             [clojure.string :as str :refer [trim-newline]]
             [clojure.data.json :as json]
             [clojure.tools.cli :refer [parse-opts]]
@@ -21,11 +21,6 @@
                (.setUserName mqtt-username))]
     (doto (MqttClient. broker-uri client-id (MemoryPersistence.))
       (.connect opts))))
-
-(defn- make-tap [c]
-  (let [out (chan)]
-    (tap c out)
-    out))
 
 (defn- shell-exec [& args]
   (let [{:keys [exit out err]} (apply shell/sh args)]
@@ -51,30 +46,31 @@
 (defn- send-message [client topic msg & {:keys [retained] :or {retained false}}]
   (.publish client topic (create-message msg retained)))
 
-;; Given a channel, listen for idle timestamps and send messages accordingly
-
 (defn- create-reporter [client time-to-idle location user host host-device]
   (let [base-topic     (format "homeassistant/binary_sensor/wallfly_%s_%s"
                                user host)
-        presence-topic (format "%s/state" base-topic)
-        emit-presence  (fn [present] (send-message client presence-topic (if present "ON" "OFF")))]
+        presence-topic (format "%s/state" base-topic)]
     (let [cfg-topic (format "%s/config" base-topic)
-          payload   {:name            (format "%s present" user)
+          payload   {:name            (format "%s present on %s" user host)
                      :device_class    :occupancy
                      :entity_category :diagnostic
                      :unique_id       (format "wallfly_%s_%s" user host)
                      :state_topic     presence-topic
                      :icon            "mdi:account-check"
+                     :off_delay       time-to-idle
                      :device          {:identifiers    [host-device]
                                        :name           (format "%s WallFly" host)
                                        :model          "WallFly"
                                        :manufacturer   "Fudo"
                                        :suggested_area location}}]
       (println (format "sending to %s: %s" cfg-topic (with-out-str (pprint payload))))
-      (send-message client cfg-topic (json/write-str payload) :retained true))
+      (send-message client cfg-topic (json/write-str payload) :retained true)
+      ;; Send one message that will persist if the host dies
+      (send-message client presence-topic "OFF" :retained true))
     (fn [idle-time]
       ;; (emit-idle idle-time)
-      (emit-presence (< idle-time time-to-idle)))))
+      (when (< idle-time time-to-idle)
+        (send-message client presence-topic "ON")))))
 
 (defn- execute! [delay-seconds report]
   (let [stop-chan  (chan)
@@ -92,9 +88,8 @@
   [["-l" "--location LOCATION" "Location (in house) of the host running this job."]
    ["-b" "--mqtt-broker-uri URI" "URI of the MQTT broker."]
    ["-u" "--mqtt-username USERNAME" "Username to use when connecting to MQTT."]
-   ["-c" "--client-id CLIENT-ID" "Client ID of this job."]
    ["-p" "--password-file PASSWORD-FILE" "Path to a file containing the password for this client."]
-   ["-t" "--idle-time SECONDS" "Number of seconds before considering this host idle."]
+   ["-t" "--time-to-idle SECONDS" "Number of seconds before considering this host idle."]
    ["-d" "--delay-time SECONDS" "Time to wait before polling for idle time."]])
 
 (defn- exit! [status msg]
@@ -114,37 +109,35 @@
     (let [resolved (into {} (map (partial get-key options) keys))
           missing  (filter (fn [k] (not (get resolved k false))) keys)]
       (if (seq missing)
-        (exit! 2 ((str "missing arguments: " (str/join " " (map name missing)))))
+        (exit! 2 (str "missing arguments: " (str/join " " (map name missing))))
         resolved))))
 
 (let [chars (map char (apply concat (map (fn [[s e]] (range (int s) (int e))) [[\0 \9] [\a \z] [\A \Z]])))]
   (defn- rand-str [n]
     (apply str (take n (repeatedly #(nth chars (rand (count chars))))))))
 
-(defn -main [args]
+(defn -main [& args]
   (let [required-keys [:location
                        :mqtt-broker-uri
-                       :client-id
-                       :password-file
+                       :mqtt-password-file
                        :time-to-idle
-                       :hostname
                        :delay-time
                        :mqtt-username]
         {:keys [location
                 mqtt-broker-uri
-                password-file
+                mqtt-password-file
                 time-to-idle
                 delay-time
                 mqtt-username]} (get-args required-keys args)
         catch-shutdown (chan)
-        password       (-> password-file (slurp) (str/trim-newline))
+        password       (-> mqtt-password-file (slurp) (str/trim-newline))
         username       (get-username)
         hostname       (get-hostname)
         host-device    (format "wallfly-%s" (get-fqdn))
         client-id      (format "wallfly-%s" (rand-str 10))
         client         (create-mqtt-client mqtt-broker-uri client-id mqtt-username password)
-        reporter       (create-reporter client time-to-idle location username hostname host-device)
-        stop-chan      (execute! delay-time reporter)]
+        reporter       (create-reporter client (Integer/parseInt time-to-idle) location username hostname host-device)
+        stop-chan      (execute! (Integer/parseInt delay-time) reporter)]
     (.addShutdownHook (Runtime/getRuntime)
                       (Thread. (fn [] (>!! catch-shutdown true))))
     (<!! catch-shutdown)

@@ -32,5 +32,11 @@
 
         devShell =
           pkgs.mkShell { buildInputs = with pkgs; [ clojure update-deps ]; };
-      });
+      }) // {
+        overlay = final: prev: {
+          inherit (self.packages."${prev.system}") wallfly;
+        };
+
+        nixosModule = import ./module.nix;
+      };
 }
