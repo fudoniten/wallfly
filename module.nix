@@ -66,16 +66,6 @@ in {
               --time-to-idle=${toString cfg.time-to-idle} \
               --delay-time=${toString cfg.delay-time}
         '';
-        PrivateTmp = true;
-        PrivateDevices = true;
-        ProtectSystem = "strict";
-        ProtectControlGroups = true;
-        ProtectKernelTunables = true;
-        ProtectKernelModules = true;
-        ProtectHostname = true;
-        ProtectHome = true;
-        ProtectClock = true;
-        ProtectKernelLogs = true;
         Restart = "always";
         StandardOutput = "journal";
       };
