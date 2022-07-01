@@ -11,7 +11,8 @@
             MqttClient
             MqttConnectOptions
             MqttMessage]
-           org.eclipse.paho.client.mqttv3.persist.MemoryPersistence))
+           org.eclipse.paho.client.mqttv3.persist.MemoryPersistence)
+  (:gen-class))
 
 (defn- create-mqtt-client [broker-uri client-id mqtt-username passwd]
   (let [opts (doto (MqttConnectOptions.)
