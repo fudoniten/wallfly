@@ -55,7 +55,7 @@ in {
 
     systemd.user.services.wallfly = {
       enable = true;
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = [ "default.target" ];
       after = [ "network-online.target" ];
       path = with pkgs; [ nettools xprintidle ];
       serviceConfig = {
