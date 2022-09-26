@@ -55,8 +55,8 @@ in {
 
     systemd.user.services.wallfly = {
       enable = true;
-      wantedBy = [ "xorg.target" ];
-      after = [ "xorg.target" ];
+      wantedBy = [ "graphical-session.target" ];
+      after = [ "graphical-session.target" ];
       path = with pkgs; [ nettools xprintidle ];
       serviceConfig = {
         ExecStart = pkgs.writeShellScript "launch-wallfly.sh" ''
