@@ -14,14 +14,21 @@
            org.eclipse.paho.client.mqttv3.persist.MemoryPersistence)
   (:gen-class))
 
+(defn- exit! [status msg]
+  (println msg)
+  (System/exit status))
+
 (defn- create-mqtt-client [broker-uri client-id mqtt-username passwd]
   (let [opts (doto (MqttConnectOptions.)
                (.setCleanSession true)
                (.setAutomaticReconnect true)
                (.setPassword (char-array passwd))
                (.setUserName mqtt-username))]
-    (doto (MqttClient. broker-uri client-id (MemoryPersistence.))
-      (.connect opts))))
+    (try
+      (doto (MqttClient. broker-uri client-id (MemoryPersistence.))
+        (.connect opts))
+      (catch Exception e
+        (exit! 1 (.getMessage e))))))
 
 (defn- shell-exec [& args]
   (let [{:keys [exit out err]} (apply shell/sh args)]
@@ -45,7 +52,10 @@
     (.setRetained retained)))
 
 (defn- send-message [client topic msg & {:keys [retained] :or {retained false}}]
-  (.publish client topic (create-message msg retained)))
+  (try
+    (.publish client topic (create-message msg retained))
+    (catch Exception e
+      (exit! 1 (.getMessage e)))))
 
 (defn- create-reporter [client time-to-idle location user host host-device]
   (let [base-topic     (format "homeassistant/binary_sensor/wallfly_%s_%s"
@@ -92,10 +102,6 @@
    ["-p" "--mqtt-password-file PASSWORD-FILE" "Path to a file containing the password for this client."]
    ["-t" "--time-to-idle SECONDS" "Number of seconds before considering this host idle."]
    ["-d" "--delay-time SECONDS" "Time to wait before polling for idle time."]])
-
-(defn- exit! [status msg]
-  (println msg)
-  (System/exit status))
 
 (defn- get-key [opts k]
   (if-let [opt (get opts k)]
