@@ -1,5 +1,5 @@
 {
-  description = "WallFly presence monitor..";
+  description = "WallFly presence monitor.";
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-22.05";
