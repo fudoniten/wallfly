@@ -59,7 +59,6 @@ in {
       after = [ "graphical-session.target" ];
       path = with pkgs; [ nettools xprintidle ];
       restartIfChanged = true;
-      restart = "always";
       serviceConfig = {
         ExecStart = pkgs.writeShellScript "launch-wallfly.sh" ''
           ${pkgs.wallfly}/bin/wallfly \
