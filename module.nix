@@ -55,7 +55,7 @@ in {
 
     systemd.user.services.wallfly = {
       enable = true;
-      wantedBy = [ "graphical-session.target" ];
+      wantedBy = [ "default.target" ];
       after = [ "graphical-session.target" ];
       path = with pkgs; [ nettools xprintidle ];
       restartIfChanged = true;
