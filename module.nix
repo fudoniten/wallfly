@@ -54,9 +54,9 @@ in {
     nixpkgs.overlays = [ wallfly-overlay ];
 
     systemd.user.services.wallfly = {
-      enable = true;
       wantedBy = [ "graphical-session.target" ];
       after = [ "graphical-session.target" ];
+      requires = [ "graphical-session.target" ];
       path = with pkgs; [ nettools xprintidle ];
       restartIfChanged = true;
       serviceConfig = {
