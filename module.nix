@@ -72,6 +72,7 @@ in {
         Restart = "always";
         StandardOutput = "journal";
       };
+      unitConfig.ConditionPathExists = [ cfg.mqtt.password-file ];
     };
   };
 }
