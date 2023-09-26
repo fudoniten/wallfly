@@ -53,26 +53,39 @@ in {
   config = mkIf cfg.enable {
     nixpkgs.overlays = [ wallfly-overlay ];
 
-    systemd.user.services.wallfly = {
-      wantedBy = [ "graphical-session.target" ];
-      after = [ "graphical-session.target" ];
-      requires = [ "graphical-session.target" ];
-      path = with pkgs; [ nettools xprintidle ];
-      restartIfChanged = true;
-      serviceConfig = {
-        ExecStart = pkgs.writeShellScript "launch-wallfly.sh" ''
-          ${pkgs.wallfly}/bin/wallfly \
-              --location=${cfg.location} \
-              --mqtt-broker-uri=${cfg.mqtt.broker-uri} \
-              --mqtt-username=${cfg.mqtt.username} \
-              --mqtt-password-file=${cfg.mqtt.password-file} \
-              --time-to-idle=${toString cfg.time-to-idle} \
-              --delay-time=${toString cfg.delay-time}
-        '';
-        Restart = "always";
-        StandardOutput = "journal";
+    systemd.user.services = {
+      wallfly-password-watcher = {
+        requiredBy = [ "wallfly.service" ];
+        before = [ "wallfly.service" ];
+        restartIfChanged = true;
+        serviceConfig = {
+          TimeoutStartSec = 180;
+          ExecStart = pkgs.writeShellScript "watch-wallfly-passwd.sh" ''
+            test -f ${cfg.mqtt.password-file} && sleep 3
+            exit 0
+          '';
+        };
       };
-      unitConfig.ConditionPathExists = [ cfg.mqtt.password-file ];
+      wallfly = {
+        wantedBy = [ "graphical-session.target" ];
+        after = [ "graphical-session.target" ];
+        requires = [ "graphical-session.target" ];
+        path = with pkgs; [ nettools xprintidle ];
+        restartIfChanged = true;
+        serviceConfig = {
+          ExecStart = pkgs.writeShellScript "launch-wallfly.sh" ''
+            ${pkgs.wallfly}/bin/wallfly \
+                --location=${cfg.location} \
+                --mqtt-broker-uri=${cfg.mqtt.broker-uri} \
+                --mqtt-username=${cfg.mqtt.username} \
+                --mqtt-password-file=${cfg.mqtt.password-file} \
+                --time-to-idle=${toString cfg.time-to-idle} \
+                --delay-time=${toString cfg.delay-time}
+          '';
+          Restart = "always";
+          StandardOutput = "journal";
+        };
+      };
     };
   };
 }
