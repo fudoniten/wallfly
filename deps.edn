@@ -6,8 +6,8 @@
         org.clojure/tools.cli { :mvn/version "1.0.206" }
 
         org.fudo/fudo-clojure {
-                               :git/url "https://git.fudo.org/fudo-public/fudo-clojure.git"
-                               :sha "c6a1ebef2e5b64d432a46ac48639c674e62b7cee"
+                               :git/url "https://fudo.dev/public/fudo-clojure.git"
+                               :sha "25467fceddcb9c81180ddb83f3e21f9ef21cd07f"
                                }
 
         org.eclipse.paho/org.eclipse.paho.client.mqttv3 { :mvn/version "1.2.5" }
