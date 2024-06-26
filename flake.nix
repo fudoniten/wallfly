@@ -5,10 +5,10 @@
     nixpkgs.url = "nixpkgs/nixos-23.11";
     utils.url = "github:numtide/flake-utils";
     helpers = {
-      url = "git+https://fudo.dev/public/nix-helpers.git";
+      url = "github:fudoniten/fudo-nix-helpers";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    fudo-clojure.url = "git+https://fudo.dev/public/fudo-clojure.git";
+    fudo-clojure.url = "github:fudoniten/fudo-clojure";
   };
 
   outputs = { self, nixpkgs, utils, helpers, fudo-clojure, ... }:
