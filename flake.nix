@@ -19,7 +19,7 @@
 
         cljLibs = {
           "org.fudo/fudo-clojure" =
-            fudo-clojure.packages."${system}".fudo-clojure;
+            fudo-clojure.packages."${system}".fudo-clojure.preppedSrc;
         };
       in {
         packages = {
