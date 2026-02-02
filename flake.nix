@@ -23,7 +23,7 @@
         };
       in {
         packages = {
-          wallfly = helpers.packages."${system}".mkClojureBin {
+          wallfly = helpers.legacyPackages."${system}".mkClojureBin {
             projectSrc = ./.;
             name = "org.fudo/wallfly";
             primaryNamespace = "wallfly.core";
@@ -37,7 +37,7 @@
         devShells = rec {
           default = updateDeps;
           updateDeps = pkgs.mkShell {
-            buildInputs = with helpers.packages."${system}";
+            buildInputs = with helpers.legacyPackages."${system}";
               [ (updateClojureDeps cljLibs) ];
           };
         };
