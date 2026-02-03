@@ -38,7 +38,7 @@
           default = updateDeps;
           updateDeps = pkgs.mkShell {
             buildInputs = with helpers.legacyPackages."${system}";
-              [ (updateClojureDeps cljLibs) ];
+              [ (updateClojureDeps { deps = cljLibs; }) ];
           };
         };
       }) // {

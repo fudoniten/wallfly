@@ -211,11 +211,11 @@
         "utils": "utils_3"
       },
       "locked": {
-        "lastModified": 1770058369,
-        "narHash": "sha256-KGVIBpZuA/epaJSFwaGRx8GaZFEzRNjMRSc7o4TQ8XA=",
+        "lastModified": 1770077493,
+        "narHash": "sha256-HgmKxXAcQBZ1l/olVlQWWyble8BdJdL7QgP7sJ2pXy4=",
         "owner": "fudoniten",
         "repo": "fudo-clojure",
-        "rev": "65bf45b72f783fe5c962c9d413685fbc0cd69779",
+        "rev": "107e56fa3222e9472892b0f3cad358223a91a257",
         "type": "github"
       },
       "original": {
@@ -457,16 +457,16 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1769900590,
-        "narHash": "sha256-I7Lmgj3owOTBGuauy9FL6qdpeK2umDoe07lM4V+PnyA=",
+        "lastModified": 1720691131,
+        "narHash": "sha256-CWT+KN8aTPyMIx8P303gsVxUnkinIz0a/Cmasz1jyIM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "41e216c0ca66c83b12ab7a98cc326b5db01db646",
+        "rev": "a046c1202e11b62cbede5385ba64908feb7bfac4",
         "type": "github"
       },
       "original": {
         "id": "nixpkgs",
-        "ref": "nixos-25.11",
+        "ref": "nixos-24.05",
         "type": "indirect"
       }
     },
@@ -621,11 +621,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1731533236,
-        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "lastModified": 1710146030,
+        "narHash": "sha256-SZ5L6eA7HJ/nmkzGG7/ISclqe6oZdOZTNoesiInkXPQ=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "rev": "b1d9ab70662946ef0850d488da1c9019f3a9752a",
         "type": "github"
       },
       "original": {
