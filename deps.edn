@@ -12,6 +12,7 @@
 
         org.eclipse.paho/org.eclipse.paho.client.mqttv3 { :mvn/version "1.2.5" }
         camel-snake-kebab/camel-snake-kebab { :mvn/version "0.4.2" }
+        com.taoensso/timbre { :mvn/version "6.6.1" }
         }
  :aliases {
            :test {
