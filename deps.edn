@@ -1,20 +1,23 @@
 {
  :paths ["src"]
  :deps {
-        org.clojure/clojure    { :mvn/version "1.12.3" }
-        org.clojure/core.async { :mvn/version "1.8.741" }
-        org.clojure/tools.cli { :mvn/version "1.3.250" }
-
-        org.fudo/fudo-clojure {
-                               :git/url "https://fudo.dev/public/fudo-clojure.git"
-                               :sha "65bf45b72f783fe5c962c9d413685fbc0cd69779"
-                               }
-
-        org.eclipse.paho/org.eclipse.paho.client.mqttv3 { :mvn/version "1.2.5" }
-        camel-snake-kebab/camel-snake-kebab { :mvn/version "0.4.2" }
-        com.taoensso/timbre { :mvn/version "6.6.1" }
+        ;; All dependencies are now built into Babashka:
+        ;; - babashka.process (for shell commands)
+        ;; - clojure.core.async (for concurrency)
+        ;; - clojure.tools.cli (for CLI parsing)
+        ;; - cheshire.core (for JSON)
+        ;; 
+        ;; This script no longer requires any external dependencies!
         }
  :aliases {
+           ;; For running with regular Clojure (if needed for development):
+           :jvm {
+                 :extra-deps {
+                              org.clojure/clojure    { :mvn/version "1.12.3" }
+                              org.clojure/core.async { :mvn/version "1.8.741" }
+                              org.clojure/tools.cli  { :mvn/version "1.3.250" }
+                              }
+                 }
            :test {
                   :extra-paths ["test"]
                   :extra-deps {
@@ -22,6 +25,5 @@
                                }
                   :main-opts ["-e" "(require '[eftest.runner :refer [find-tests run-tests]]) (run-tests (find-tests \"test\"))"]
                   }
-           :build { :default-ns build }
            }
  }
