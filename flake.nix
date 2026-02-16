@@ -4,43 +4,36 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-25.11";
     utils.url = "github:numtide/flake-utils";
-    helpers = {
-      url = "github:fudoniten/fudo-nix-helpers";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    fudo-clojure.url = "github:fudoniten/fudo-clojure";
   };
 
-  outputs = { self, nixpkgs, utils, helpers, fudo-clojure, ... }:
+  outputs = { self, nixpkgs, utils, ... }:
     utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages."${system}";
         gs = import nixpkgs { inherit system; };
 
-        cljLibs = {
-          "org.fudo/fudo-clojure" =
-            fudo-clojure.packages."${system}".fudo-clojure.preppedSrc;
-        };
       in {
         packages = {
-          wallfly = helpers.legacyPackages."${system}".mkClojureBin {
-            projectSrc = ./.;
-            name = "org.fudo/wallfly";
-            primaryNamespace = "wallfly.core";
+          wallfly = pkgs.stdenv.mkDerivation {
+            pname = "wallfly";
+            version = "0.1";
             src = ./.;
-            inherit cljLibs;
+
+            buildInputs = [ pkgs.babashka ];
+
+            installPhase = ''
+              mkdir -p $out/bin
+              cp -r src $out/
+              cat > $out/bin/wallfly <<EOF
+              #!${pkgs.bash}/bin/bash
+              exec ${pkgs.babashka}/bin/bb $out/src/wallfly/core.clj "\$@"
+              EOF
+              chmod +x $out/bin/wallfly
+            '';
           };
         };
 
         defaultPackage = self.packages."${system}".wallfly;
-
-        devShells = rec {
-          default = updateDeps;
-          updateDeps = pkgs.mkShell {
-            buildInputs = with helpers.legacyPackages."${system}";
-              [ (updateClojureDeps { deps = cljLibs; }) ];
-          };
-        };
       }) // {
         overlay = final: prev: {
           inherit (self.packages."${prev.system}") wallfly;
